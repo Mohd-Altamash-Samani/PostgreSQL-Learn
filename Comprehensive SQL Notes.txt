@@ -1,0 +1,586 @@
+SQL Notes
+
+Written Order in SQL Query:
+SELECT
+FROM
+JOIN
+WHERE
+GROUP BY
+HAVING
+ORDER BY
+LIMIT
+
+Execution Order in SQL:
+FROM
+JOIN
+WHERE
+GROUP BY
+HAVING
+SELECT
+DISTINCT
+ORDER BY
+LIMIT
+
+1. DDL (Data Definition Language):
+CREATE
+ALTER
+DROP
+RENAME
+TRUNCATE
+
+2. DML (Data Manipulation Language):
+SELECT
+INSERT
+UPDATE
+DELETE
+MERGE
+
+3. DCL (Data Control Language):
+GRANT
+REVOKE
+
+4. TCL (Transaction Control Language):
+COMMIT
+ROLLBACK
+SAVEPOINT
+SET TRANSACTION
+
+5. DQL (Data Query Language)
+SELECT
+
+Create Table:
+
+CREATE TABLE Department (
+    DepartmentID INT PRIMARY KEY,
+    DepartmentName VARCHAR(50) UNIQUE NOT NULL,
+    PRIMARY KEY (DepartmentID, DepartmentName) --Composite Primary Key
+);
+
+CREATE TABLE Employee (
+    EmployeeID INT PRIMARY KEY,                    -- Primary Key: Ensures unique, non-null IDs
+    FirstName VARCHAR(50) NOT NULL,                -- Variable-length string Cannot have null values
+    LastName VARCHAR(50) NOT NULL,
+    Email VARCHAR(100) UNIQUE,                     -- UNIQUE: Ensures no duplicate emails
+    PhoneNumber VARCHAR(15) CHECK (LENGTH(PhoneNumber) >= 10), -- CHECK: Ensures the length
+    DepartmentID INT DEFAULT 1,                    -- DEFAULT: Sets a default value
+    Salary DECIMAL(10, 2) NOT NULL,                -- NOT NULL for mandatory fields
+    HireDate DATE NOT NULL,
+    IsActive BOOLEAN DEFAULT TRUE,                 -- DEFAULT for status
+    FOREIGN KEY (DepartmentID) REFERENCES Department(DepartmentID) -- FOREIGN KEY: Links to another table
+);
+
+Inserting Data:
+
+INSERT INTO Department (DepartmentID, DepartmentName) 
+VALUES 
+(1, 'Human Resources'),
+(2, 'Finance'),
+(3, 'Engineering'),
+(4, 'Sales'),
+(5, 'Marketing');
+
+INSERT INTO Employee (EmployeeID, FirstName, LastName, Email, PhoneNumber, DepartmentID, Salary, HireDate, IsActive) 
+VALUES 
+(1, 'John', 'Doe', 'john.doe@example.com', '1234567890', 3, 75000.00, '2020-01-15', TRUE),
+(2, 'Jane', 'Smith', 'jane.smith@example.com', '9876543210', 2, 65000.00, '2019-03-20', TRUE),
+(3, 'Alice', 'Johnson', 'alice.johnson@example.com', '4561237890', 1, 58000.00, '2021-06-11', TRUE),
+(4, 'Bob', 'Brown', 'bob.brown@example.com', '3216549870', 3, 90000.00, '2018-07-19', TRUE),
+(5, 'Charlie', 'Williams', 'charlie.williams@example.com', '7891234560', 4, 72000.00, '2020-11-23', TRUE),
+(6, 'Eve', 'Taylor', 'eve.taylor@example.com', '9638527410', 2, 67000.00, '2021-02-14', TRUE),
+(7, 'Mike', 'Anderson', 'mike.anderson@example.com', '7412589630', 5, 85000.00, '2019-12-10', FALSE),
+(8, 'Sophia', 'Martinez', 'sophia.martinez@example.com', '8529637410', 4, 68000.00, '2021-01-30', TRUE),
+(9, 'Liam', 'Thomas', 'liam.thomas@example.com', '7531594862', 1, 56000.00, '2022-08-15', TRUE),
+(10, 'Emma', 'Jackson', 'emma.jackson@example.com', '9513574862', 3, 89000.00, '2017-10-01', TRUE),
+(11, 'Noah', 'White', 'noah.white@example.com', '1472583690', 2, 74000.00, '2016-09-21', FALSE),
+(12, 'Olivia', 'Harris', 'olivia.harris@example.com', '3698521470', 1, 60000.00, '2022-03-18', TRUE),
+(13, 'Lucas', 'Martin', 'lucas.martin@example.com', '2589631470', 5, 93000.00, '2020-05-22', TRUE),
+(14, 'Mia', 'Garcia', 'mia.garcia@example.com', '9871236540', 4, 61000.00, '2021-12-01', TRUE),
+(15, 'Ethan', 'Clark', 'ethan.clark@example.com', '7896541230', 3, 80000.00, '2019-04-15', TRUE),
+(16, 'Ava', 'Lopez', 'ava.lopez@example.com', '6543217890', 1, 57000.00, '2023-01-11', TRUE),
+(17, 'William', 'Lee', 'william.lee@example.com', '3219876540', 2, 69000.00, '2022-07-05', TRUE),
+(18, 'Isabella', 'Young', 'isabella.young@example.com', '1237894560', 5, 91000.00, '2020-02-25', TRUE),
+(19, 'James', 'King', 'james.king@example.com', '4567891230', 4, 63000.00, '2021-08-20', TRUE),
+(20, 'Charlotte', 'Wright', 'charlotte.wright@example.com', '7534861590', 1, 59000.00, '2023-02-14', TRUE),
+(21, 'Henry', 'Hill', 'henry.hill@example.com', '9518467320', 2, 70000.00, '2018-03-12', TRUE),
+(22, 'Amelia', 'Scott', 'amelia.scott@example.com', '1597534860', 3, 87000.00, '2019-06-08', TRUE),
+(23, 'Benjamin', 'Green', 'benjamin.green@example.com', '9517534860', 5, 91000.00, '2020-09-29', TRUE),
+(24, 'Harper', 'Adams', 'harper.adams@example.com', '7539514860', 4, 64000.00, '2021-11-11', TRUE),
+(25, 'Alexander', 'Nelson', 'alexander.nelson@example.com', '6541597530', 2, 72000.00, '2022-01-22', TRUE);
+
+-- Inserting Data into All Columns
+
+INSERT INTO Employees (employee_id, first_name, last_name, email, phone_number, hire_date, salary, department_id, manager_id, status, gender, date_of_birth)
+VALUES (1, 'John', 'Doe', 'john.doe@example.com', '123-456-7890', '2024-01-01', 50000.00, 2, NULL, 'A', 'M', '1990-05-15');
+
+-- Inserting Data into Specific Columns (Some columns can be omitted)
+
+INSERT INTO Employees (first_name, last_name, email, hire_date, salary)
+VALUES ('Jane', 'Smith', 'jane.smith@example.com', '2024-02-01', 60000.00);
+
+-- Inserting Multiple Rows at Once
+
+INSERT INTO Employees (first_name, last_name, email, hire_date, salary)
+VALUES 
+    ('Alice', 'Green', 'alice.green@example.com', '2024-03-01', 55000.00),
+    ('Bob', 'White', 'bob.white@example.com', '2024-03-10', 45000.00);
+
+-- Inserting Data Using SELECT from Another Table
+
+INSERT INTO NewEmployees (first_name, last_name, email)
+SELECT first_name, last_name, email
+FROM Employees
+WHERE hire_date > '2024-01-01';
+
+Alter Table:
+
+-- Add a new column to the Employees table
+
+ALTER TABLE Employees
+ADD Email VARCHAR(100);
+
+-- Modify the datatype of a column
+
+ALTER TABLE Employees 
+MODIFY FirstName VARCHAR(100);
+
+-- Drop a column
+
+ALTER TABLE Employees 
+DROP COLUMN HireDate;
+
+-- To change a Constraint
+
+ALTER TABLE Students 
+DROP CONSTRAINT UQ_StudentEmail;
+
+ALTER TABLE Students 
+ADD CONSTRAINT UQ_StudentEmail UNIQUE (Email, PhoneNumber);
+
+-- To find the name of the Constraint
+-- SELECT CONSTRAINT_NAME 
+-- FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS 
+-- WHERE TABLE_NAME = 'Students';
+
+Drop Table:
+
+-- Drop the Employees table
+DROP TABLE Employees;
+
+-- Drop the database
+DROP DATABASE CompanyDB;
+
+-- Dropping the view 
+DROP VIEW IF EXISTS EmployeeSales;
+
+Rename Command:
+
+-- Rename the Employees table to Staff
+
+ALTER TABLE Employees 
+RENAME Employees TO Staff;
+
+-- Rename the Employees Column
+
+ALTER TABLE Employees 
+RENAME COLUMN FirstName TO First_Name;
+
+Truncate Command:
+
+-- Truncate the Employees table (removes all rows, but keeps the table)
+
+TRUNCATE TABLE Employees; 
+
+
+Data Query Language:
+
+SELECT * FROM Students;
+SELECT COUNT(*) FROM Students WHERE Age > 18;
+
+
+Data Manipulation Language:
+
+Update command:
+
+SET Age = 35
+WHERE EmployeeID = 2;
+
+Delete Command:
+
+DELETE FROM Employees
+WHERE EmployeeID = 3;
+
+Merge Command:
+
+MERGE INTO Students AS Target
+USING NewStudents AS Source
+ON Target.ID = Source.ID
+WHEN MATCHED THEN
+    UPDATE SET Target.Name = Source.Name
+WHEN NOT MATCHED THEN
+    INSERT (ID, Name, Age) VALUES (Source.ID, Source.Name, Source.Age);
+
+
+Transaction Control Language:
+
+TCL commands manage transactions in the database:
+
+-- COMMIT: Save changes made by the transaction.
+
+INSERT INTO Students (ID, Name, Age) VALUES (2, 'Alice', 22);
+COMMIT;
+
+-- ROLLBACK: Undo changes made in the current transaction
+
+DELETE FROM Students WHERE Age < 18;
+ROLLBACK;
+
+-- SAVEPOINT: Set a savepoint to roll back to specific points in the transaction.
+
+SAVEPOINT BeforeDeletion;
+DELETE FROM Students WHERE Age < 18;
+ROLLBACK TO BeforeDeletion;
+
+-- SET TRANSACTION: used to configure the properties of a transaction
+
+SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+
+
+Data Control Language:
+
+DCL commands control access and privileges to database objects:
+
+GRANT: Give a user specific privileges on an object.
+--Grant SELECT, INSERT permission to user1
+
+GRANT SELECT, INSERT
+ON Employees TO user1;
+
+REVOKE: Remove privileges from a user.
+--Revoke SELECT permission from user1
+
+REVOKE SELECT
+ON Employees FROM user1;
+
+
+SQL Filtering:
+
+-- Using the WHERE Clause
+
+SELECT * 
+FROM Employees 
+WHERE Age > 30;
+
+-- Comparison Operators
+
+SELECT * 
+FROM Products
+WHERE Price >= 50;
+
+-- Logical Operators
+
+SELECT * 
+FROM Employees
+WHERE Age > 30 AND Department = 'Sales';
+
+SELECT * 
+FROM Employees
+WHERE Age < 30 OR Department = 'HR';
+
+SELECT * 
+FROM Employees
+WHERE NOT Department = 'Marketing';
+
+-- Using BETWEEN for Range Filtering
+
+SELECT * 
+FROM Products
+WHERE Price BETWEEN 50 AND 100;
+
+-- Using IN for Multiple Values
+
+SELECT * 
+FROM Students
+WHERE Grade IN ('A', 'B');
+
+-- Using LIKE for Pattern Matching
+
+SELECT * 
+FROM Customers
+WHERE Name LIKE 'J%';
+
+-- Matches a pattern 'A_23' (A followed by any character, then '23')
+
+SELECT * 
+FROM Products
+WHERE ProductCode LIKE 'A_23';
+
+-- Using IS NULL
+
+SELECT * 
+FROM Employees
+WHERE ManagerID IS NULL;
+
+-- Combining Multiple Conditions
+
+SELECT * 
+FROM Employees
+WHERE (Age > 30 OR Department = 'HR') AND Salary > 50000;
+
+-- Using DISTINCT to Eliminate Duplicate Records
+
+SELECT DISTINCT Department
+FROM Employees;
+
+-- Using ORDER BY to Sort Results
+
+SELECT * 
+FROM Employees 
+ORDER BY Age DESC;
+
+-- Sorts by Department (ascending) and then by Age (descending within each department)
+
+SELECT * 
+FROM Employees 
+ORDER BY Department ASC, Age DESC;
+
+-- Math Operators for Calculations
+
+SELECT EmployeeID, Salary, Salary * 0.1 AS Bonus
+FROM Employees;
+
+-- Calculates total cost by multiplying Price and Quantity for each order
+
+SELECT OrderID, ProductID, Price, Quantity, Price * Quantity AS TotalCost
+FROM Orders;
+
+-- Aggregate Functions for Summary Calculations
+
+-- Counts the total number of employees
+
+SELECT COUNT(*) AS TotalEmployees
+FROM Employees;
+
+-- Calculates the average salary of employees
+
+SELECT AVG(Salary) AS AverageSalary
+FROM Employees;
+
+-- Calculates the total sales amount
+
+SELECT SUM(Sales) AS TotalSales
+FROM SalesData;
+
+-- Using GROUP BY for Aggregations within Groups
+
+-- Counts the number of employees in each department
+
+SELECT Department, COUNT(*) AS NumEmployees
+FROM Employees
+GROUP BY Department;
+
+-- Calculates the average salary within each department
+
+SELECT Department, AVG(Salary) AS AvgSalary
+FROM Employees
+GROUP BY Department;
+
+-- Using GROUP BY with HAVING to filter groups based on aggregate values
+
+-- Shows departments with an average salary greater than 50,000
+
+SELECT Department, AVG(Salary) AS AvgSalary
+FROM Employees
+GROUP BY Department
+HAVING AVG(Salary) > 50000;
+
+-- Subquery: Selects employees in departments located in New York
+
+SELECT * 
+FROM Employees
+WHERE Department IN 
+    (SELECT Department FROM Departments WHERE Location = 'New York');
+
+
+Joining Tables:
+
+-- 1. INNER JOIN: Returns only matching rows between both tables
+
+SELECT Employees.EmployeeID, Employees.Name, Departments.DepartmentName
+FROM Employees
+INNER JOIN Departments ON Employees.DepartmentID = Departments.DepartmentID;
+
+-- Explanation:
+-- This join returns records where there is a match in both Employees and Departments tables based on DepartmentID.
+-- Only rows with matching DepartmentID values in both tables will be included.
+
+
+-- 2. LEFT JOIN (or LEFT OUTER JOIN): Returns all rows from the left table, and matching rows from the right table. Non-matching rows from the right table will return NULL.
+
+SELECT Employees.EmployeeID, Employees.Name, Departments.DepartmentName
+FROM Employees
+LEFT JOIN Departments ON Employees.DepartmentID = Departments.DepartmentID;
+
+-- Explanation:
+-- This join returns all employees, including those who do not have a corresponding department.
+-- If an employee's DepartmentID does not match any DepartmentID in the Departments table, the DepartmentName will be NULL.
+
+
+-- 3. RIGHT JOIN (or RIGHT OUTER JOIN): Returns all rows from the right table, and matching rows from the left table. Non-matching rows from the left table will return NULL.
+
+SELECT Employees.EmployeeID, Employees.Name, Departments.DepartmentName
+FROM Employees
+RIGHT JOIN Departments ON Employees.DepartmentID = Departments.DepartmentID;
+
+-- Explanation:
+-- This join returns all departments, including those that have no employees.
+-- If a department’s DepartmentID does not match any DepartmentID in the Employees table, the EmployeeID and Name will be NULL.
+
+
+-- 4. FULL JOIN (or FULL OUTER JOIN): Returns all rows when there is a match in either left or right table. Non-matching rows from both tables will show NULLs in place of missing values.
+
+SELECT Employees.EmployeeID, Employees.Name, Departments.DepartmentName
+FROM Employees
+FULL JOIN Departments ON Employees.DepartmentID = Departments.DepartmentID;
+
+-- Explanation:
+-- This join returns all employees and departments.
+-- If an employee has no matching department, the DepartmentName will be NULL, and vice versa for departments with no matching employees.
+
+
+-- 5. CROSS JOIN: Returns the Cartesian product of both tables, combining all rows from the left table with all rows from the right table.
+
+SELECT Employees.EmployeeID, Employees.Name, Departments.DepartmentName
+FROM Employees
+CROSS JOIN Departments;
+
+-- Explanation:
+-- This join returns every possible combination of Employees and Departments, regardless of whether there is a logical connection between them.
+-- If Employees has 5 rows and Departments has 3 rows, this will return 5 * 3 = 15 rows.
+
+
+-- 6. SELF JOIN: Joins a table with itself, useful for finding related rows within the same table.
+
+-- Example: Finding pairs of employees who work in the same department
+SELECT E1.EmployeeID AS EmployeeID1, E1.Name AS Name1, 
+       E2.EmployeeID AS EmployeeID2, E2.Name AS Name2, 
+       E1.DepartmentID
+FROM Employees E1
+INNER JOIN Employees E2 ON E1.DepartmentID = E2.DepartmentID
+WHERE E1.EmployeeID < E2.EmployeeID;
+
+-- Explanation:
+-- This join pairs employees within the same department by joining the Employees table with itself.
+-- The WHERE clause (E1.EmployeeID < E2.EmployeeID) avoids duplicate pairs by ensuring that each pair is listed only once.
+
+-- 7: UNION (removes duplicates)
+
+SELECT Name, Department FROM Employees
+UNION
+SELECT Name, Department FROM Managers;
+
+-- Explanation: Combines employees and managers, only keeping unique rows.
+
+-- 8: UNION ALL (keeps duplicates)
+
+SELECT Name, Department FROM Employees
+UNION ALL
+SELECT Name, Department FROM Managers;
+
+-- Explanation: Combines employees and managers, retaining duplicates.
+
+-- Text String Functions
+
+SELECT UPPER(Name) AS UpperName,
+       LOWER(Name) AS LowerName,
+       FirstName || ' ' || LastName AS FullName,  -- CONCAT alternative
+       SUBSTR(Name, 1, 3) AS FirstThreeChars,     -- SUBSTRING alternative
+       LENGTH(Name) AS NameLength,
+       REPLACE(Name, 'John', 'Jon') AS NewName
+FROM Employees;
+
+-- Date and Time Functions
+
+SELECT DATE('now') AS TodayDate,                -- CURRENT_DATE alternative
+       TIME('now') AS CurrentTime,              -- CURRENT_TIME alternative
+       STRFTIME('%Y', HireDate) AS HireYear,    -- EXTRACT(YEAR) alternative
+       DATE(HireDate, '+7 days') AS NextWeek,   -- DATEADD alternative for 7 days
+       (CAST(STRFTIME('%Y', 'now') AS INTEGER) - 
+        CAST(STRFTIME('%Y', BirthDate) AS INTEGER)) AS Age, -- DATEDIFF alternative
+       STRFTIME('%Y-%m-%d', HireDate) AS FormattedDate  -- FORMAT date alternative
+FROM Employees;
+
+-- CASE Statements
+
+-- Simple CASE statement for department names based on DepartmentID
+SELECT Name,
+       CASE DepartmentID
+           WHEN 1 THEN 'Sales'
+           WHEN 2 THEN 'HR'
+           WHEN 3 THEN 'IT'
+           ELSE 'Other'
+       END AS DepartmentName
+FROM Employees;
+
+-- CASE with multiple conditions for salary ranges
+SELECT Name,
+       CASE 
+           WHEN Salary >= 80000 THEN 'High'
+           WHEN Salary BETWEEN 50000 AND 79999 THEN 'Medium'
+           ELSE 'Low'
+       END AS SalaryRange
+FROM Employees;
+
+-- Views
+CREATE VIEW EmployeeSales AS
+SELECT EmployeeID, Name, SalesAmount
+FROM Employees
+WHERE Department = 'Sales';
+
+-- Using the view to retrieve data
+SELECT * FROM EmployeeSales;
+
+
+Window Function:
+
+SELECT column_name,
+       window_function() OVER (
+         [PARTITION BY column_name]
+         [ORDER BY column_name]
+         [ROWS/RANGE clause]
+       )
+FROM table_name;
+
+Aggregate Functions
+
+SELECT employee_id, department, salary,
+       SUM(salary) OVER (PARTITION BY department) AS dept_total_salary,  -- Total salary for each department
+       AVG(salary) OVER (PARTITION BY department) AS dept_avg_salary,    -- Average salary per department
+       MIN(salary) OVER (PARTITION BY department) AS dept_min_salary,    -- Minimum salary in the department
+       MAX(salary) OVER (PARTITION BY department) AS dept_max_salary,    -- Maximum salary in the department
+       COUNT(*) OVER (PARTITION BY department) AS dept_employee_count    -- Employee count in each department
+FROM employees;
+
+Ranking Functions
+
+SELECT employee_id, department, salary,
+       ROW_NUMBER() OVER (ORDER BY salary DESC) AS row_num,  -- Assigns a unique row number starting from 1 based on salary
+       RANK() OVER (PARTITION BY department ORDER BY salary DESC) AS rank_in_dept,  -- Ranks employees in each department, with gaps in rank for ties
+       DENSE_RANK() OVER (PARTITION BY department ORDER BY salary DESC) AS dense_rank_in_dept,  -- Ranks employees in each department, no gaps for ties
+       NTILE(4) OVER (ORDER BY salary DESC) AS salary_quartile  -- Divides employees into 4 quartiles based on salary
+FROM employees;
+
+Analytic Functions
+
+SELECT employee_id, department, salary,
+       FIRST_VALUE(salary) OVER (PARTITION BY department ORDER BY salary) AS first_salary_in_dept,  -- First salary in the department
+       LAST_VALUE(salary) OVER (PARTITION BY department ORDER BY salary ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING) AS last_salary_in_dept,  -- Last salary in the department
+       LAG(salary, 1) OVER (PARTITION BY department ORDER BY salary) AS prev_salary,  -- Previous row's salary
+       LEAD(salary, 1) OVER (PARTITION BY department ORDER BY salary) AS next_salary,  -- Next row's salary
+       SUM(salary) OVER (ORDER BY salary ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS cumulative_salary,  -- Cumulative sum of salary up to the current row
+       AVG(salary) OVER (ORDER BY salary ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg_salary  -- Moving average of salary (previous 2 rows and current)
+FROM employees;
+
+
+
+
+
