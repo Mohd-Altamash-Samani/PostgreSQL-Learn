@@ -1,125 +1,183 @@
--- Write a query to list distinct travel routes, normalizing source and destination, 
--- so that (source, destination) and (destination, source) are treated as the same route.
+-- Level 1 Questions
 
--- Creating the travel table
-CREATE TABLE travel (
-    source VARCHAR(15),
-    destination VARCHAR(15),
-    distance VARCHAR(15)
-);
+-- Q1: Who is the senior-most employee based on levels?
 
--- Inserting data into the travel table
-INSERT INTO travel (source, destination, distance)
-VALUES
-    ('Thane', 'Dadar', 500),
-    ('Dadar', 'Thane', 500),
-    ('Karjat', 'Nashik', 200),
-    ('Nashik', 'Karjat', 200),
-    ('Rabodi', 'Mumbra', 1200),
-    ('Mumbra', 'Rabodi', 1200);
+SELECT 
+    first_name, 
+    last_name, 
+    title, 
+    levels
+FROM employee
+ORDER BY levels DESC
+LIMIT 1;
 
--- Selecting all data from the travel table
-SELECT * FROM travel;
+-- Q2: Which countries have the most invoices?
 
--- Method 1: Using LEAST and GREATEST Functions
+SELECT 
+    billing_country, 
+    COUNT(billing_country) AS billing_count
+FROM invoice
+GROUP BY billing_country
+ORDER BY billing_count DESC;
+
+-- Q3: What are the top 3 values of total invoice amounts? 
+
+SELECT 
+    total
+FROM invoice
+ORDER BY total DESC
+LIMIT 3;
+
+-- Q4: Which city has the best customers?
+/* We want to identify the city with the highest sum of invoice totals. */
+
+SELECT 
+    billing_city, 
+    SUM(total) AS total
+FROM invoice
+GROUP BY billing_city
+ORDER BY total DESC
+LIMIT 1;
+
+-- Q5: Who is the best customer? 
+/* Identify the customer who has spent the most money. */
+
+SELECT 
+    c.customer_id, 
+    first_name, 
+    last_name, 
+    SUM(i.total) AS total_spent
+FROM customer c
+JOIN invoice i ON c.customer_id = i.customer_id
+GROUP BY c.customer_id
+ORDER BY total_spent DESC
+LIMIT 1;
+
+-- Level 2 Questions
+
+-- Q1: List the email, first name, last name, and genre of all Rock music listeners. 
+
 SELECT DISTINCT 
-    LEAST(source, destination) AS source_normalized,
-    GREATEST(source, destination) AS destination_normalized,
-    distance
-FROM travel
-ORDER BY 
-    source_normalized, 
-    destination_normalized;
+    c.first_name, 
+    c.last_name, 
+    c.email
+FROM customer c
+JOIN invoice i ON c.customer_id = i.customer_id
+JOIN invoice_line il ON i.invoice_id = il.invoice_id
+JOIN track t ON t.track_id = il.track_id
+JOIN genre g ON t.genre_id = g.genre_id
+WHERE g.name LIKE 'Rock';
 
--- Method 2: Using Self-Join
-WITH cte_t AS (
-    SELECT *, ROW_NUMBER() OVER (ORDER BY source, destination) AS srn
-    FROM travel
-)
-SELECT t1.source, t1.destination, t1.distance
-FROM cte_t AS t1
-JOIN cte_t AS t2
-    ON (t1.source = t2.destination AND t1.destination = t2.source)
-    AND t1.srn < t2.srn;
+-- Q2: Which artists have written the most Rock music? 
+/* Return the artist name and total track count for the top 10 rock artists. */
 
--- Write a query to generate all possible pairs of teams such that no team is paired with itself, 
--- and each pair is listed only once.
+SELECT 
+    a.artist_id, 
+    a.name, 
+    COUNT(a.artist_id) AS track_count
+FROM artist a
+JOIN album al ON al.artist_id = a.artist_id
+JOIN track t ON t.album_id = al.album_id
+JOIN genre g ON g.genre_id = t.genre_id
+WHERE g.name LIKE 'Rock'
+GROUP BY a.artist_id
+ORDER BY track_count DESC
+LIMIT 10;
 
--- Creating the match table
-CREATE TABLE match (
-    team VARCHAR(10)
-);
+-- Q3: List all track names with a song length longer than the average. 
+/* Return the name and length, ordered by length (longest first). */
 
--- Inserting data into the match table
-INSERT INTO match (team)
-VALUES
-    ('Aus'),
-    ('Ind'),
-    ('Eng'),
-    ('Pak');
+SELECT 
+    t.name, 
+    t.milliseconds
+FROM track t
+WHERE t.milliseconds > (SELECT AVG(milliseconds) FROM track)
+ORDER BY t.milliseconds DESC;
 
--- Selecting all data from the match table
-SELECT * FROM match;
+-- Q4: How much has each customer spent on artists? 
+/* Return the customer name, artist name, and total spent. */
 
--- Generating All Possible Pairs
-WITH cte AS (
-    SELECT *, ROW_NUMBER() OVER (ORDER BY team ASC) AS id
-    FROM match
-)
-SELECT a.team AS team1, b.team AS team2
-FROM cte AS a
-JOIN cte AS b
-    ON a.id != b.id
-WHERE a.id < b.id
-ORDER BY a.team, b.team;
+SELECT 
+    c.customer_id, 
+    c.first_name, 
+    c.last_name, 
+    SUM(i.total) AS total_spent
+FROM customer c
+JOIN invoice i ON c.customer_id = i.customer_id
+GROUP BY c.customer_id
+ORDER BY total_spent DESC;
 
--- Divide employees into 4 equal-sized groups and display the concatenated employee IDs and names for each group.
 
--- Creating the emp table
-CREATE TABLE emp (
-    ID INT,
-    name VARCHAR(10)
-);
+-- Level 3 Questions
 
--- Inserting data into the emp table
-INSERT INTO emp (ID, name)
-VALUES
-    (1, 'emp1'),
-    (2, 'emp2'),
-    (3, 'emp3'),
-    (4, 'emp4'),
-    (5, 'emp5'),
-    (6, 'emp6'),
-    (7, 'emp7'),
-    (8, 'emp8');
+-- Q1: Find the customer who spent the most on the artist with the highest sales. 
+/* Identify the best-selling artist and their top customer. */
 
--- Selecting all data from the emp table
-SELECT * FROM emp;
-
--- Group Employees into Equal-Sized Groups
-WITH cte AS (
+WITH best_selling_artist AS (
     SELECT 
-        CONCAT(ID, ' ', name) AS con,
-        NTILE(4) OVER () AS groups
-    FROM emp
+        artist.artist_id AS artist_id, 
+        artist.name AS artist_name, 
+        SUM(invoice_line.unit_price * invoice_line.quantity) AS total_sales
+    FROM invoice_line
+    JOIN track ON track.track_id = invoice_line.track_id
+    JOIN album ON album.album_id = track.album_id
+    JOIN artist ON artist.artist_id = album.artist_id
+    GROUP BY artist.artist_id
+    ORDER BY total_sales DESC
+    LIMIT 1
 )
 SELECT 
-    STRING_AGG(con, ', ') AS result,
-    groups
-FROM cte
-GROUP BY groups
-ORDER BY groups;
+    c.customer_id, 
+    c.first_name, 
+    c.last_name, 
+    bsa.artist_id, 
+    bsa.artist_name, 
+    SUM(il.unit_price * il.quantity) AS amount_spent
+FROM invoice i
+JOIN customer c ON c.customer_id = i.customer_id
+JOIN invoice_line il ON il.invoice_id = i.invoice_id
+JOIN track t ON t.track_id = il.track_id
+JOIN album alb ON alb.album_id = t.album_id
+JOIN best_selling_artist bsa ON bsa.artist_id = alb.artist_id
+GROUP BY c.customer_id, c.first_name, c.last_name, bsa.artist_id, bsa.artist_name
+ORDER BY amount_spent DESC;
 
--- To generate a table of 7 using recursion in SQL
+-- Q2: Determine the most popular music genre in each country. 
+/*  List each country with its top genre. */
 
-WITH RECURSIVE TableOfSeven AS (
-    SELECT 1 AS multiplier, 7 AS result
-    UNION ALL
-
-    SELECT multiplier + 1, 7 * (multiplier + 1)
-    FROM TableOfSeven
-    WHERE multiplier < 10  
+WITH popular_genre AS (
+    SELECT 
+        COUNT(invoice_line.quantity) AS purchases, 
+        customer.country, 
+        genre.name, 
+        genre.genre_id, 
+        ROW_NUMBER() OVER(PARTITION BY customer.country ORDER BY COUNT(invoice_line.quantity) DESC) AS RowNo
+    FROM invoice_line
+    JOIN invoice ON invoice.invoice_id = invoice_line.invoice_id
+    JOIN customer ON customer.customer_id = invoice.customer_id
+    JOIN track ON track.track_id = invoice_line.track_id
+    JOIN genre ON genre.genre_id = track.genre_id
+    GROUP BY customer.country, genre.name, genre.genre_id
 )
-SELECT multiplier, result
-FROM TableOfSeven;
+SELECT * 
+FROM popular_genre 
+WHERE RowNo = 1;
 
+-- Q3: Find the customer who spent the most on music in each country. 
+/* Return the country, customer name, and total spending. */
+
+WITH customer_with_country AS (
+    SELECT 
+        customer.customer_id, 
+        first_name, 
+        last_name, 
+        billing_country, 
+        SUM(total) AS total_spending,
+        ROW_NUMBER() OVER(PARTITION BY billing_country ORDER BY SUM(total) DESC) AS RowNo
+    FROM invoice
+    JOIN customer ON customer.customer_id = invoice.customer_id
+    GROUP BY customer.customer_id, first_name, last_name, billing_country
+)
+SELECT * 
+FROM customer_with_country 
+WHERE RowNo = 1;
