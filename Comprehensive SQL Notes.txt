@@ -29,7 +29,6 @@ RENAME
 TRUNCATE
 
 2. DML (Data Manipulation Language):
-SELECT
 INSERT
 UPDATE
 DELETE
@@ -201,6 +200,7 @@ Data Manipulation Language:
 
 Update command:
 
+Update Employees
 SET Age = 35
 WHERE EmployeeID = 2;
 
@@ -217,7 +217,8 @@ ON Target.ID = Source.ID
 WHEN MATCHED THEN
     UPDATE SET Target.Name = Source.Name
 WHEN NOT MATCHED THEN
-    INSERT (ID, Name, Age) VALUES (Source.ID, Source.Name, Source.Age);
+    INSERT (ID, Name, Age) 
+    VALUES (Source.ID, Source.Name, Source.Age);
 
 
 Transaction Control Language:
@@ -237,7 +238,8 @@ ROLLBACK;
 -- SAVEPOINT: Set a savepoint to roll back to specific points in the transaction.
 
 SAVEPOINT BeforeDeletion;
-DELETE FROM Students WHERE Age < 18;
+DELETE FROM Students 
+WHERE Age < 18;
 ROLLBACK TO BeforeDeletion;
 
 -- SET TRANSACTION: used to configure the properties of a transaction
@@ -488,6 +490,14 @@ SELECT Name, Department FROM Managers;
 
 -- Explanation: Combines employees and managers, retaining duplicates.
 
+-- 9: NATURAL JOIN : automatically joins tables based on columns with the same name and data type
+
+-- Example: Automatically matches columns with the same name
+
+SELECT *
+FROM students
+NATURAL JOIN enrollments;
+
 -- Text String Functions
 
 SELECT UPPER(Name) AS UpperName,
@@ -580,24 +590,6 @@ SELECT employee_id, department, salary,
        AVG(salary) OVER (ORDER BY salary ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS moving_avg_salary  -- Moving average of salary (previous 2 rows and current)
 FROM employees;
 
-Stored Procedure:
-
-A Stored Procedure is a set of SQL statements that are stored in the database and can be executed as a reusable program. Stored procedures are ideal for automating complex tasks or performing operations that require multiple SQL statements.
-
--- Create a stored procedure to increase an employee's salary
-CREATE PROCEDURE IncreaseSalary(emp_id INT, increment INT)
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    UPDATE Employee
-    SET Salary = Salary + increment
-    WHERE EmpID = emp_id;
-END;
-$$;
-
--- Call the procedure
-CALL IncreaseSalary(1, 5000);
-
 Common Table Expression:
 
 A Common Table Expression (CTE) is a temporary result set that you can define and reference within a single SQL query. CTEs are especially useful for simplifying complex queries and improving readability.
@@ -610,8 +602,4 @@ WITH SalariesAbove100K AS (
 )
 SELECT EmpName
 FROM SalariesAbove100K;
-
-
-
-
 
